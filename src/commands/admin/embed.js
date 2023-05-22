@@ -106,7 +106,7 @@ module.exports = {
                         iconURL: author ? author.displayAvatarURL({ dynamic: true }) : null,
                         url: author ? author.displayAvatarURL({ dynamic: true }) : null,
                     },
-                }).setColor(color)
+                }).setColor(color || "#000000")
             ]
         }).then(m => {
             interaction.editReply({

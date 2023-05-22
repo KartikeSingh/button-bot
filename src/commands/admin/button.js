@@ -1,6 +1,6 @@
 const { randomID } = require('create-random-id');
-const { EmbedBuilder } = require('discord.js');
-const button = require("../../models/button");
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder } = require('discord.js');
+const buttonModel = require("../../models/button");
 const createButtons = require("../../utility/createButtons");
 
 module.exports = {
@@ -59,7 +59,27 @@ module.exports = {
             }, {
                 name: "replies",
                 type: 3,
-                description: "The urls for the buttons, separate them via | example: reply a | reply b1: reply b2",
+                description: "The replies for the buttons, separate them via | example: reply a | reply b1: reply b2",
+                required: true,
+            }]
+        }, {
+            name: "custom",
+            type: 1,
+            description: "Create a button mix!",
+            options: [{
+                name: "labels",
+                type: 3,
+                description: "The labels for the buttons, separate them via | example: button one| second one|last one",
+                required: true,
+            }, {
+                name: "styles",
+                type: 3,
+                description: "The styles for the buttons, separate them via | example: link| red| green",
+                required: true,
+            }, {
+                name: "action",
+                type: 3,
+                description: "The action for the buttons, example:  https://x.co | role: @somerole | reply one : reply 2",
                 required: true,
             }]
         }],
@@ -70,9 +90,11 @@ module.exports = {
         await interaction.deferReply({ ephemeral: true });
 
         const option = interaction.options.getSubcommand();
-        const labels = interaction.options.getString("labels")?.split("|");
+        const action = interaction.options.getString("action")?.split("|")?.map(v => v.trim());
+        const labels = interaction.options.getString("labels")?.split("|")?.map(v => v.trim());
         const styles = interaction.options.getString("styles")?.replace(/blue/gi, 1)?.replace(/grey/gi, 2)?.replace(/green/gi, 3)?.replace(/red/gi, 4)?.split("|").map(v => parseInt(v));
-        const roles = interaction.options.getString("roles")?.split("|")?.map(v => interaction.guild.roles.cache.get(v.match(/\d+/)+""))?.filter(v => v);
+        const styles2 = interaction.options.getString("styles")?.replace(/blue/gi, 1)?.replace(/grey/gi, 2)?.replace(/green/gi, 3)?.replace(/red/gi, 4)?.replace(/link/gi, 5)?.split("|").map(v => parseInt(v));
+        const roles = interaction.options.getString("roles")?.split("|")?.map(v => interaction.guild.roles.cache.get(v.match(/\d+/) + ""))?.filter(v => v);
         const urls = interaction.options.getString("urls")?.split("|")?.map(v => v.trim());
         const replies = interaction.options.getString("replies")?.split("|")?.map(v => v?.split(":"));
 
@@ -105,7 +127,7 @@ module.exports = {
                             new EmbedBuilder()
                                 .setColor("Red")
                                 .setTitle("❌ Buttons Failed")
-                                .setDescription(`\`\`\`${e.substring(0, 4000)}\`\`\``)
+                                .setDescription(`\`\`\`${e.toString().substring(0, 4000)}\`\`\``)
                         ]
                     })
                 })
@@ -156,7 +178,7 @@ module.exports = {
             const buttons = [];
 
             for (let i = 0; i < max; i++) {
-                buttons.push(await button.create({
+                buttons.push(await buttonModel.create({
                     guild: interaction.guildId,
                     id: randomID(12),
                     replies: replies[i]?.map(v => v?.trim())?.filter(v => v),
@@ -182,7 +204,111 @@ module.exports = {
                             new EmbedBuilder()
                                 .setColor("Red")
                                 .setTitle("❌ Buttons Failed")
-                                .setDescription(`\`\`\`${e.substring(0, 4000)}\`\`\``)
+                                .setDescription(`\`\`\`${e.toString().substring(0, 4000)}\`\`\``)
+                        ]
+                    });
+
+                    buttons.forEach(async b => b.delete())
+                })
+        } else if (option === "custom") {
+            const max = Math.max(labels.length, styles2.length, action.length);
+
+            if (action.length < max) return interaction.editReply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor("Red")
+                        .setDescription(`Number of replies can't be less then labels or styles etc`)
+                ]
+            });
+
+            const buttons = [];
+            const rows = [];
+            const errors = [];
+
+            let ind = 0;
+
+            for (let i = 0; i < max; i++) {
+                let button;
+                if (styles2[i] === 5) {
+                    if (!action[i]?.startsWith("http")) {
+                        errors.push(`Invalid URL [\`${i + 1}\` Button], Input: \`${action[i]}\``);
+                        continue;
+                    }
+
+                    button = new ButtonBuilder()
+                        .setLabel(labels[i] || `${i + 1}`)
+                        .setStyle(5)
+                        .setURL(action[i]);
+                } else if (action[i]?.startsWith("role:")) {
+                    const role = interaction.guild.roles.cache.get(action[i].match(/\d+/) + "");
+
+                    if (!role) {
+                        errors.push(`Invalid Role [\`${i + 1}\` Button], Input: \`${action[i]}\``);
+                        continue;
+                    }
+
+                    button = new ButtonBuilder()
+                        .setLabel(labels[i] || `${i + 1}`)
+                        .setStyle(styles[i] || 1)
+                        .setCustomId(`role-${role.id}`);
+                } else {
+                    const buttonData = await buttonModel.create({
+                        guild: interaction.guildId,
+                        id: randomID(12),
+                        replies: action[i]?.split(":")?.map(v => v?.trim())?.filter(v => v),
+                        type: 0
+                    });
+
+                    buttons.push(buttonData);
+
+                    button = new ButtonBuilder()
+                        .setLabel(labels[i] || `${i + 1}`)
+                        .setStyle(styles[i] || 1)
+                        .setCustomId(`reply-${buttonData.id}`);
+                }
+
+                if ((rows[ind]?.components?.length || 0) >= 5) ind++;
+
+                rows[ind] ? rows[ind].addComponents(button) : rows[ind] = new ActionRowBuilder()
+                    .addComponents(
+                        button
+                    )
+            }
+
+            if (errors.length) {
+                buttons.forEach(async b => b.delete())
+
+                return interaction.editReply({
+                    embeds: [
+                        new EmbedBuilder()
+                            .setColor("Red")
+                            .setTitle("❌ Invalid Usage")
+                            .setDescription(errors.join("\n"))
+                    ]
+                });
+            }
+
+            interaction.channel.send({
+                components: rows
+            })
+                .then(() => {
+                    interaction.editReply({
+                        embeds: [
+                            new EmbedBuilder()
+                                .setColor("Green")
+                                .setTitle("✅ Buttons Sent")
+                        ]
+                    })
+                })
+                .catch((e) => {
+                    buttons.forEach(async b => b.delete());
+                    console.log(e)
+                    interaction.editReply({
+                        embeds: [
+                            new EmbedBuilder()
+                                .setColor("Red")
+                                .setTitle("❌ Buttons Failed")
+                                .setDescription(`\`\`\`${e.toString().substring(0, 4000)}\`\`\``)
                         ]
                     })
                 })
