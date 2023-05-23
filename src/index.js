@@ -2,13 +2,34 @@
 require('dotenv').config();
 
 // Imports
-const { GatewayIntentBits, Partials } = require('discord.js');
+const { GatewayIntentBits, Partials, EmbedBuilder } = require('discord.js');
 const Client = require('./utility/Client');
 
 // HTTP server setup
-const app = (require('express'))();
+const express = require('express');
+const app = express();
+
+app.use(express.json());
 
 app.get('/', (req, res) => res.sendStatus(200));
+
+app.post('/vote/e', async (req, res) => {
+    const userId = req.body.user;
+    const user = client.users.cache.get(userId);
+
+    if (!userId) return;
+
+    client.channels.cache.get("979710018385494016")?.send({
+        embeds: [
+            new EmbedBuilder()
+                .setColor("DarkGreen")
+                .setTitle("New Vote")
+                .setDescription(`<@${userId}> (${user ? user.username : userId}) has voted for me on [top.gg](https://top.gg/bot/1108647987120447538/vote)`)
+        ]
+    });
+
+    res.sendStatus(200);
+})
 
 app.listen(process.env.PORT || 3001);
 
@@ -27,7 +48,7 @@ const client = new Client({
 client.login(process.env.TOKEN);
 
 client.on("messageDelete", message => {
-    if (message.author.id !== client.user.id || !message.components?.length) return;
+    if (message.author?.id !== client.user.id || !message.components?.length) return;
 
     message.components.forEach(component => {
         component.components.forEach(async bt => {
@@ -35,3 +56,5 @@ client.on("messageDelete", message => {
         })
     });
 });
+
+process.on("uncaughtException", console.log);
