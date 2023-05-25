@@ -13,6 +13,9 @@ app.use(express.json());
 
 app.get('/', (req, res) => res.sendStatus(200));
 
+app.get("/privacy_policy", (req, res) => res.sendFile(__dirname + "/pages/privacy_policy.html"))
+app.get("/terms_of_service", (req, res) => res.sendFile(__dirname + "/pages/terms_of_service.html"))
+
 app.post('/vote/e', async (req, res) => {
     const userId = req.body.user;
     const user = client.users.cache.get(userId);

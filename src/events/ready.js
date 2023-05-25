@@ -6,7 +6,7 @@ module.exports = async (client) => {
     client.user.setActivity({
         name: "all them buttons",
         type: ActivityType.Watching,
-    })
+    });
 
     client.application.commands.set(client.commands.map(v => v.data));
 }

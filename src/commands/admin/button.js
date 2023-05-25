@@ -302,7 +302,6 @@ module.exports = {
                 })
                 .catch((e) => {
                     buttons.forEach(async b => b.delete());
-                    console.log(e)
                     interaction.editReply({
                         embeds: [
                             new EmbedBuilder()
