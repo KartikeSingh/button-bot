@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="https://cdn.bot-list.xyz/i/4646724e28a90eda42aa0cbdcc480fb6">
+    <link rel="stylesheet" type="text/css" href="index.css" />
+    <title>Button Bot</title>
+</head>
+
+<body>
+    <style>
+        /*
+grey : #a3a8a5
+black : #141414
+*/
+
+        @import url("https://fonts.googleapis.com/css2?family=Poppins&display=swap");
+
+        html,
+        body {
+            height: 100%;
+            font-family: "Poppins";
+            box-sizing: border-box;
+        }
+
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        body::-webkit-scrollbar {
+            display: none;
+        }
+
+        div#first-big-div,
+        div#second-big-div {
+            padding-top: 50px;
+            padding-bottom: 50px;
+            background-color: #141414;
+            background-image: url("./wavelight.svg");
+            background-position-y: bottom;
+            background-repeat: no-repeat;
+            width: 100%;
+            height: 700px;
+        }
+
+        div#second-big-div {
+            display: block;
+            background-image: url("./wavedark.svg");
+            padding-top: 0px;
+            background-color: #a3a8a5;
+            height: auto;
+            padding-bottom: 400px;
+        }
+
+        nav {
+            font-size: 22px;
+            border-radius: 12px;
+            background-color: #141414;
+            box-shadow: 0px 0px 5px 1px #a3a3a3;
+            width: 70%;
+            justify-content: space-between;
+            margin: 0 auto;
+            padding: 25px;
+            align-items: center;
+            display: flex;
+            height: 40px;
+            margin: 0 auto;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #a3a3a3;
+        }
+
+        .content-body {
+            display: flex;
+            width: 70%;
+            margin: 0 auto;
+            padding: 25px;
+            justify-content: space-between;
+            margin-top: 55px;
+        }
+
+        .content-body h1 {
+            font-size: 64px;
+            color: #eaeaea;
+            font-weight: lighter;
+        }
+
+        .content-body aside {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        #button {
+            background-color: #eaeaea;
+            font-size: 22px;
+            padding: 15px;
+            width: 180px;
+            font-weight: 900;
+            text-align: center;
+            border-radius: 35px;
+            box-shadow: 0px 0px 5px 1px rgba(0, 0, 0, 0.25);
+        }
+
+        div#stats-container {
+            padding-top: 0px;
+            display: flex;
+            margin: 0 auto;
+            width: 70%;
+            justify-content: space-between;
+        }
+
+        div.stat-card {
+            text-align: center;
+            margin: 0 auto;
+            border-radius: 35px;
+            box-shadow: 0px 0px 5px 2px rgba(0, 0, 0, 0.35);
+            padding: 18px;
+            background-color: #141414;
+            color: #eaeaea;
+            font-size: 18px;
+        }
+
+        div#button a {
+            text-decoration: none;
+            color: #141414;
+        }
+
+        footer {
+            height: 200px;
+            background-color: #141414;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        #footer-shit {
+            width: 70%;
+            display: flex;
+            justify-content: space-between;
+            color: #eaeaea;
+            margin: 0 auto;
+        }
+
+        footer ul {
+            list-style: none;
+        }
+
+        footer h1 {
+            font-size: 24px;
+            font-weight: lighter;
+            color: #eaeaea;
+        }
+
+        footer ul li a {
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: normal;
+            color: #eaeaea;
+        }
+
+        div.feature-container {
+            padding-top: 0px;
+            display: flex;
+            margin: 0 auto;
+            width: 80%;
+            justify-content: space-between;
+        }
+
+        h1.feature-head {
+            font-size: 28px;
+            text-align: center;
+            width: 100%;
+            margin: 0 auto;
+            font-weight: 800;
+            padding-top: 0px;
+            padding-bottom: 20px;
+            color: #141414;
+        }
+
+        div.feature-card {
+            background-color: #141414;
+            border-radius: 18px;
+            margin: 0 auto;
+            height: 330px;
+            width: 280px;
+            margin-bottom: 30px;
+            margin-top: 15px;
+            color: #a3a8a5;
+            box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.35);
+            padding: 18px;
+        }
+
+        .custom-select {
+            position: relative;
+            margin: 0 auto;
+            margin-bottom: 10px;
+            font-family: Arial;
+        }
+
+        .custom-select select {
+            display: none;
+        }
+
+        .select-selected {
+            border-radius: 10px;
+            background-color: #141414;
+        }
+
+        .select-selected:after {
+            position: absolute;
+            content: "";
+            top: 14px;
+            right: 10px;
+            width: 0;
+            height: 0;
+            border: 6px solid transparent;
+            border-color: #fff transparent transparent transparent;
+        }
+
+        .select-selected.select-arrow-active:after {
+            border-color: transparent transparent #fff transparent;
+            top: 7px;
+        }
+
+        .select-items div,
+        .select-selected {
+            color: #a3a8a5;
+            padding: 8px 16px;
+            border: 1px solid transparent;
+            border-color: transparent transparent rgba(24, 23, 23, 0.1) transparent;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        /*style items (options):*/
+        .select-items {
+            position: absolute;
+            background-color: #141414;
+            top: 100%;
+            left: 0;
+            border-radius: 8px;
+            right: 0;
+            z-index: 99;
+        }
+
+        .select-hide {
+            display: none;
+        }
+
+        .select-items div:hover,
+        .same-as-selected {
+            background-color: rgba(206, 198, 198, 0.1);
+        }
+
+        .command-div,
+        #command-note {
+            background-color: #141414;
+            box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.55);
+            border-radius: 18px;
+            width: 70%;
+            color: #d1cfcf;
+            margin: 0% auto;
+            height: auto;
+            padding: 25px;
+            display: none;
+        }
+
+        .command-name-head {
+            padding-top: 10px;
+            font-size: 24px;
+            font-weight: 600;
+            color: #a3a3a3;
+        }
+
+        #command-note {
+            display: block;
+            padding-top: 12px;
+            margin-bottom: 30px;
+        }
+
+        #command-note p.command-name-head {
+            font-weight: 500;
+            font-size: 20px;
+        }
+
+        .commands-visible {
+            display: block;
+        }
+
+        @media only screen and (max-width: 800px) {
+            img#bot-pfp {
+                display: none;
+            }
+
+            nav {
+                height: auto;
+                display: block;
+            }
+
+            nav a {
+                display: block;
+                padding-bottom: 8px;
+            }
+
+            div.feature-container {
+                display: block;
+            }
+
+            div#second-big-div {
+                padding-bottom: 100px;
+            }
+
+            div#first-big-div {
+                padding-bottom: 100px;
+            }
+
+            div#stats-container {
+                display: block;
+            }
+
+            div.stat-card {
+                margin-bottom: 20px;
+            }
+
+            div#krazy-footer {
+                display: none;
+            }
+
+            div.feature-card {
+                margin: 0 auto;
+                margin-top: 20px;
+                margin-bottom: 25px;
+                height: 300px;
+            }
+
+            h1.feature-head {
+                width: 100%;
+                margin: 0 auto;
+            }
+
+            div.feature-container {
+                width: 100%;
+            }
+
+            div.stats-container {
+                width: 100%;
+            }
+
+            div.stat-card {
+                margin: 0 auto;
+                margin-bottom: 20px;
+                margin-top: 20px;
+            }
+        }
+
+        @media only screen and (max-width: 1000px) {
+            div.feature-container {
+                display: block;
+            }
+
+            div.feature-card {
+                height: 250px;
+                width: 80%;
+            }
+        }
+
+        @media only screen and (max-width:500px) {
+            img#bot-pfp {
+                display: none;
+            }
+
+            nav {
+                height: auto;
+                display: block;
+            }
+
+            nav a {
+                display: block;
+                padding-bottom: 8px;
+            }
+
+            div.feature-container {
+                display: block;
+            }
+
+            div#second-big-div {
+                padding-bottom: 100px;
+            }
+
+            div#stats-container {
+                display: block;
+            }
+
+            div.stat-card {
+                margin-bottom: 20px;
+            }
+
+            div#krazy-footer {
+                display: none;
+            }
+
+            div.feature-card {
+                margin: 0 auto;
+                margin-top: 20px;
+                margin-bottom: 25px;
+            }
+
+            h1.feature-head {
+                width: 100%;
+                margin: 0 auto;
+            }
+
+            div.feature-container {
+                width: 100%;
+            }
+
+            div.stats-container {
+                width: 100%;
+            }
+
+            div.stat-card {
+                margin: 0 auto;
+                margin-bottom: 20px;
+                margin-top: 20px;
+            }
+
+            div.feature-card {
+                height: 350px;
+                width: 80%;
+            }
+        }
+    </style>
+    <div id="first-big-div">
+        <nav id="nav-bar">
+            <a class="nav-links" href="./home">Home</a>
+            <a class="nav-links" target="_blank" href="https://top.gg/bot/1108647987120447538/vote">Vote</a>
+            <a class="nav-links" href="http://www.paypal.me/kartikepoor">Donate</a>
+            <a class="nav-links" href="https://discord.gg/QWguu9BY6g">Support</a>
+            <a class="nav-links" href="https://top.gg/bot/1108647987120447538/invite">Invite</a>
+        </nav>
+        <section class="content-body">
+            <aside>
+                <h1 id="main-head-top">Button Bot</h1>
+                <div id="button">
+                    <a id="main-a-top" href="https://top.gg/bot/1108647987120447538/invite">Invite </a>
+                </div>
+            </aside>
+        </section>
+    </div>
+    <div id="second-big-div">
+        <h1 class="feature-head">Categories</h1>
+        <div class="custom-select" id="custom-select" style="width:200px;">
+            <select>
+                <option value="0">Select Category</option>
+                <option value="1">Admin</option>
+            </select>
+        </div>
+        <h1 class="feature-head">Commands</h1>
+        <div id="command-note">
+            <p class="command-name-head">All of the commands are slash commands</p>
+        </div>
+
+        <div class="command-div admin">
+            <div class="command">
+                <p class="command-name-head">button role</p>
+                <p>Create a role giving button</p>
+            </div>
+            <div class="command">
+                <p class="command-name-head">button link</p>
+                <p>Create a link button</p>
+            </div>
+            <div class="command">
+                <p class="command-name-head">button reply</p>
+                <p>Create a reply giving button, don't forget about the random rpelies in it</p>
+            </div>
+            <div class="command">
+                <p class="command-name-head">button custom</p>
+                <p>Create a mix of buttons, all type of buttons but in a single command</p>
+            </div>
+            <div class="command">
+                <p class="command-name-head">embed</p>
+                <p>Easily make kool embeds</p>
+            </div>
+        </div>
+    </div>
+    <footer id="footer-bottom">
+        <div id="footer-shit">
+
+            <div id="Credits-container">
+                <h1 class="footer-heads">Credits</h1>
+                <ul>
+                    <li><a href="https://www.no-api-key.com">Shisui Sama</a></li>
+                    <li><a href="https://botlists.com">Kartike Singh</a></li>
+                </ul>
+            </div>
+            <div class="footer-links">
+                <h1 class="footer-heads">Website</h1>
+                <ul>
+                    <li><a href="https://top.gg/bot/1108647987120447538/vote">Vote Bot</a></li>
+                    <li><a href="https://discord.gg/QWguu9BY6g">Join US</a></li>
+                </ul>
+                <br>
+                <input type="checkbox" id="modeChoose">
+                <p style="display: inline;" id="mode-thing">Light Mode</p>
+            </div>
+            <div class="footer-links">
+                <h1 class="footer-heads">Links</h1>
+                <ul>
+                    <li><a href="https://discord.gg/QWguu9BY6g">Discord</a></li>
+                    <li><a href="https://www.patreon.com/bePatron?u=41658675">Patreon</a></li>
+                    <li><a href="https://www.youtube.com/channel/UCSqcbw8r8TZKYUhx4mufvNg">Youtube</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+    <script src="https://krazyboard.glitch.me/script.js"></script>
+</body>
+
+</html>
