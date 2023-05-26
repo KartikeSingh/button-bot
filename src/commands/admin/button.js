@@ -59,7 +59,7 @@ module.exports = {
             }, {
                 name: "replies",
                 type: 3,
-                description: "The replies for the buttons, separate them via | example: reply a | reply b1: reply b2",
+                description: "The replies for the buttons, separate them via | example: a | reply : Hi {mention}, name is {user}",
                 required: true,
             }]
         }, {

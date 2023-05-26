@@ -54,13 +54,13 @@ module.exports = async (client, interaction) => {
             ]
         });
 
-        const reply = data.replies[Math.floor(Math.random() * data.replies.length)];
+        const reply = data.replies[Math.floor(Math.random() * data.replies.length)]|| "something went wrong";
 
         interaction.editReply({
             embeds: [
                 new EmbedBuilder()
                     .setColor("Random")
-                    .setDescription(reply || "something went wrong")
+                    .setDescription(reply.replace(/{user}/g, interaction.user.username).replace(/{mention}/, interaction.user.toString()).replace(/{server}/g, interaction.guild.name)) 
             ]
         });
     }
