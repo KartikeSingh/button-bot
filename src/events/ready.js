@@ -8,5 +8,13 @@ module.exports = async (client) => {
         type: ActivityType.Watching,
     });
 
-    client.application.commands.set(client.commands.map(v => v.data));
+    client.application.commands.set(client.commands.map(v => v.data)).then(cmds => {
+        cmds.toJSON().forEach(cmd => {
+            const rawCommand = client.commands.get(cmd.name);
+
+            rawCommand.id = cmd.id;
+
+            client.commands.set(cmd.name, rawCommand);
+        })
+    });
 }

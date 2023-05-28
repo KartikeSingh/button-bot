@@ -10,7 +10,7 @@ module.exports = {
         options: [{
             name: "role",
             type: 1,
-            description: "Create a button role",
+            description: "Create a button which gives or takes the selected role",
             options: [{
                 name: "labels",
                 type: 3,
@@ -30,7 +30,7 @@ module.exports = {
         }, {
             name: "link",
             type: 1,
-            description: "Create a button link",
+            description: "Create a button which takes users to selected url",
             options: [{
                 name: "labels",
                 type: 3,
@@ -45,7 +45,7 @@ module.exports = {
         }, {
             name: "reply",
             type: 1,
-            description: "Create a button reply",
+            description: "Create a button which replies (you can generate random replies too)",
             options: [{
                 name: "labels",
                 type: 3,
@@ -65,7 +65,7 @@ module.exports = {
         }, {
             name: "custom",
             type: 1,
-            description: "Create a button mix!",
+            description: "Create a mix of all the button types",
             options: [{
                 name: "labels",
                 type: 3,
