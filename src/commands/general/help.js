@@ -82,7 +82,7 @@ module.exports = {
             // Select menu collector for category
             const col = msg.createMessageComponentCollector({
                 filter: (i) => i.user.id === interaction.user.id,
-                time: 10000,
+                time: 600000,
             });
 
             // Select menu collector for category
@@ -120,7 +120,7 @@ module.exports = {
 
                 const col2 = msg.createMessageComponentCollector({
                     filter: (i) => i.user.id === interaction.user.id,
-                    time: 60000
+                    time: 600000
                 });
 
                 col2.on('collect', async (i) => {

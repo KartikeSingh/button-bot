@@ -26,6 +26,10 @@ module.exports = {
                 type: 3,
                 description: "The roles for the buttons, separate them via | example: @role| @role| @role",
                 required: true,
+            }, {
+                name: "message",
+                type: 3,
+                description: "Input bot's message url, if you want to add buttons in it",
             }]
         }, {
             name: "link",
@@ -41,6 +45,10 @@ module.exports = {
                 type: 3,
                 description: "The urls for the buttons, separate them via | example: https://stuff | another one",
                 required: true,
+            }, {
+                name: "message",
+                type: 3,
+                description: "Input bot's message url, if you want to add buttons in it",
             }]
         }, {
             name: "reply",
@@ -61,6 +69,10 @@ module.exports = {
                 type: 3,
                 description: "The replies for the buttons, separate them via | example: a | reply : Hi {mention}, name is {user}",
                 required: true,
+            }, {
+                name: "message",
+                type: 3,
+                description: "Input bot's message url, if you want to add buttons in it",
             }]
         }, {
             name: "custom",
@@ -81,6 +93,10 @@ module.exports = {
                 type: 3,
                 description: "The action for the buttons, example:  https://x.co | role: @somerole | reply one : reply 2",
                 required: true,
+            }, {
+                name: "message",
+                type: 3,
+                description: "Input bot's message url, if you want to add buttons in it",
             }]
         }],
     },
@@ -97,6 +113,9 @@ module.exports = {
         const roles = interaction.options.getString("roles")?.split("|")?.map(v => interaction.guild.roles.cache.get(v.match(/\d+/) + ""))?.filter(v => v);
         const urls = interaction.options.getString("urls")?.split("|")?.map(v => v.trim());
         const replies = interaction.options.getString("replies")?.split("|")?.map(v => v?.split(":"));
+        const [channelId, messageId] = interaction.options.getString("message")?.split("/")?.slice(5);
+        const channel = interaction.guild.channels.cache.get(channelId);
+        const message = await channel?.messages?.fetch(messageId);
 
         if (option === "role") {
             const max = Math.max(labels.length, styles.length, roles.length);
@@ -109,9 +128,21 @@ module.exports = {
                 ]
             });
 
-            interaction.channel.send({
-                components: createButtons("role", labels, styles, roles.map(v => v.id))
-            })
+            const buttons = createButtons("role", labels, styles, roles.map(v => v.id));
+
+            if (!Array.isArray(buttons)) return interaction.editReply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor("Red")
+                        .setDescription(`\`\`\`${buttons}\`\`\``)
+                ]
+            });
+
+            (message ? message.edit({
+                components: buttons
+            }) : interaction.channel.send({
+                components: buttons
+            }))
                 .then(() => {
                     interaction.editReply({
                         embeds: [
@@ -142,9 +173,21 @@ module.exports = {
                 ]
             });
 
-            interaction.channel.send({
-                components: createButtons("url", labels, [], urls)
-            })
+            const buttons = createButtons("url", labels, [], urls);
+
+            if (!Array.isArray(buttons)) return interaction.editReply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor("Red")
+                        .setDescription(`\`\`\`${buttons}\`\`\``)
+                ]
+            });
+
+            (message ? message.edit({
+                components: buttons
+            }) : interaction.channel.send({
+                components: buttons
+            }))
                 .then(() => {
                     interaction.editReply({
                         embeds: [
@@ -186,9 +229,21 @@ module.exports = {
                 }))
             }
 
-            interaction.channel.send({
-                components: createButtons("reply", labels, styles, buttons.map(v => v.id))
-            })
+            const buttonsC = createButtons("reply", labels, styles, buttons.map(v => v.id));
+
+            if (!Array.isArray(buttonsC)) return interaction.editReply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor("Red")
+                        .setDescription(`\`\`\`${buttonsC}\`\`\``)
+                ]
+            });
+
+            (message ? message.edit({
+                components: buttons
+            }) : interaction.channel.send({
+                components: buttons
+            }))
                 .then(() => {
                     interaction.editReply({
                         embeds: [
@@ -288,9 +343,11 @@ module.exports = {
                 });
             }
 
-            interaction.channel.send({
-                components: rows
-            })
+            (message ? message.edit({
+                components: buttons
+            }) : interaction.channel.send({
+                components: buttons
+            }))
                 .then(() => {
                     interaction.editReply({
                         embeds: [
