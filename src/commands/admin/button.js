@@ -91,7 +91,31 @@ module.exports = {
             }, {
                 name: "action",
                 type: 3,
-                description: "The action for the buttons, example:  https://x.co | role: @somerole | reply one : reply 2",
+                description: "The action for the buttons, example:  https://x.co | role: @role | reply | ticket: tik_{name} : #cat",
+                required: true,
+            }, {
+                name: "message",
+                type: 3,
+                description: "Input bot's message url, if you want to add buttons in it",
+            }]
+        }, {
+            name: "ticket",
+            type: 1,
+            description: "Create some ticket buttons",
+            options: [{
+                name: "labels",
+                type: 3,
+                description: "The labels for the buttons, separate them via | example: button one| second one|last one",
+                required: true,
+            }, {
+                name: "styles",
+                type: 3,
+                description: "The styles for the buttons, separate them via | example: red| green",
+                required: true,
+            }, {
+                name: "action",
+                type: 3,
+                description: "The data for the buttons, example: ticket-{name} | ticket-{name} : #tickets-category",
                 required: true,
             }, {
                 name: "message",
@@ -99,6 +123,8 @@ module.exports = {
                 description: "Input bot's message url, if you want to add buttons in it",
             }]
         }],
+        dm_permission: false,
+        default_member_permissions: "0",
     },
     timeout: 100,
 
@@ -113,7 +139,7 @@ module.exports = {
         const roles = interaction.options.getString("roles")?.split("|")?.map(v => interaction.guild.roles.cache.get(v.match(/\d+/) + ""))?.filter(v => v);
         const urls = interaction.options.getString("urls")?.split("|")?.map(v => v.trim());
         const replies = interaction.options.getString("replies")?.split("|")?.map(v => v?.split(":"));
-        const [channelId, messageId] = interaction.options.getString("message")?.split("/")?.slice(5);
+        const [channelId, messageId] = interaction.options.getString("message")?.split("/")?.slice(5) || [];
         const channel = interaction.guild.channels.cache.get(channelId);
         const message = await channel?.messages?.fetch(messageId);
 
@@ -306,6 +332,13 @@ module.exports = {
                         .setLabel(labels[i] || `${i + 1}`)
                         .setStyle(styles[i] || 1)
                         .setCustomId(`role-${role.id}`);
+                } else if (action[i]?.startsWith("ticket:")) {
+                    const [___, format, category] = action[i].split(":");
+
+                    button = new ButtonBuilder()
+                        .setLabel(labels[i] || `${i + 1}`)
+                        .setStyle(styles[i] || 1)
+                        .setCustomId(`ticket-${(format || "ticket_{name}").replaceAll("-","_").trim().slice(0,50)}-${category?.match(/\d+/) + ""}`);
                 } else {
                     const buttonData = await buttonModel.create({
                         guild: interaction.guildId,
@@ -344,6 +377,56 @@ module.exports = {
             }
 
             (message ? message.edit({
+                components: rows
+            }) : interaction.channel.send({
+                components: rows
+            }))
+                .then(() => {
+                    interaction.editReply({
+                        embeds: [
+                            new EmbedBuilder()
+                                .setColor("Green")
+                                .setTitle("✅ Buttons Sent")
+                        ]
+                    })
+                })
+                .catch((e) => {
+                    buttons.forEach(async b => b.delete());
+                    interaction.editReply({
+                        embeds: [
+                            new EmbedBuilder()
+                                .setColor("Red")
+                                .setTitle("❌ Buttons Failed")
+                                .setDescription(`\`\`\`${e.toString().substring(0, 4000)}\`\`\``)
+                        ]
+                    })
+                })
+        } else if (option === "ticket") {
+            const max = Math.max(labels.length, styles.length, action.length);
+
+            if (action.length < max) return interaction.editReply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor("Red")
+                        .setDescription(`Number of actions can't be less then labels or styles etc`)
+                ]
+            });
+
+            const buttons = createButtons("ticket", labels, styles, action.map(v => {
+                const x = v.split(/\s*:\s*/);
+
+                return `${(x[0]?.replaceAll("-", "_") || "ticket_{name}").slice(0, 50)}-${x[1]?.match(/\d+/) + ""}`
+            }));
+
+            if (!Array.isArray(buttons)) return interaction.editReply({
+                embeds: [
+                    new EmbedBuilder()
+                        .setColor("Red")
+                        .setDescription(`\`\`\`${buttons}\`\`\``)
+                ]
+            });
+
+            (message ? message.edit({
                 components: buttons
             }) : interaction.channel.send({
                 components: buttons
@@ -358,7 +441,6 @@ module.exports = {
                     })
                 })
                 .catch((e) => {
-                    buttons.forEach(async b => b.delete());
                     interaction.editReply({
                         embeds: [
                             new EmbedBuilder()

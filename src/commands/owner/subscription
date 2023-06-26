@@ -1,0 +1,40 @@
+module.exports = {
+    data: {
+        name: "subscription",
+        description: "Manage the bot subscriptions",
+        options: [{
+            name: "list",
+            type: 1,
+            description: "View active subs",
+        }, {
+            name: "manage",
+            type: 1,
+            description: "Manage subscritpions",
+            options: [{
+                name: "guild",
+                type: 3,
+                description: "Guild you want to manage",
+                required: true,
+            }, {
+                name: "tier",
+                type: 4,
+                description: "Choose the tier",
+            },{
+                name: "since",
+                type: 3,
+                description: "Set the subscribed since time",
+            },{
+                name: "till",
+                type: 3,
+                description: "Set the subscribed till time",
+            }]
+        }],
+    },
+    timeout: 1000,
+
+    run: async (client, interaction) => {
+        await interaction.deferReply({ ephemeral: true });
+
+
+    }
+}

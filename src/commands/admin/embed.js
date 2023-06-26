@@ -46,10 +46,16 @@ module.exports = {
             name: "footer-icon",
             type: 3,
             description: "Footer icon of the embed",
+        }, {
+            name: "message",
+            type: 3,
+            description: "Input bot's message url, if you want to add buttons in it",
         }],
     },
     timeout: 5000,
     permissions: ["ManageGuild"],
+    dm_permission: false,
+    default_member_permissions: "0",
 
     /**
      * 
@@ -58,7 +64,8 @@ module.exports = {
      * @returns 
      */
     run: async (client, interaction) => {
-        const channel = interaction.options.getChannel("channel"),
+        const
+            channel = interaction.options.getChannel("channel"),
             title = interaction.options.getString("title"),
             titleUrl = interaction.options.getString("title-url"),
             description = interaction.options.getString("description"),
@@ -67,7 +74,11 @@ module.exports = {
             color = interaction.options.getString("color"),
             footerText = interaction.options.getString("footer-text"),
             footerIcon = interaction.options.getString("footer-icon"),
-            author = interaction.options.getUser("author");
+            author = interaction.options.getUser("author"),
+            [channelId, messageId] = interaction.options.getString("message")?.split("/")?.slice(5),
+            _channel = interaction.guild.channels.cache.get(channelId),
+            message = await _channel?.messages?.fetch(messageId);
+
 
         if (!title && !thumbnail && !description && !image && !color && !footerIcon && !footerText && !author) return interaction.reply({
             embeds: [
@@ -85,36 +96,40 @@ module.exports = {
             ]
         })
 
-        channel.send({
-            embeds: [
-                new EmbedBuilder({
-                    title,
-                    thumbnail: {
-                        url: thumbnail
-                    },
-                    image: {
-                        url: image
-                    },
-                    description,
-                    footer: {
-                        text: footerText,
-                        icon: footerIcon
-                    },
-                    url: titleUrl,
-                    author: {
-                        name: author?.username,
-                        iconURL: author ? author.displayAvatarURL({ dynamic: true }) : null,
-                        url: author ? author.displayAvatarURL({ dynamic: true }) : null,
-                    },
-                }).setColor(color || "#000000")
-            ]
-        }).then(m => {
+        const embed = new EmbedBuilder({
+            title,
+            thumbnail: {
+                url: thumbnail
+            },
+            image: {
+                url: image
+            },
+            description,
+            footer: {
+                text: footerText,
+                icon: footerIcon
+            },
+            url: titleUrl,
+            author: {
+                name: author?.username,
+                iconURL: author ? author.displayAvatarURL({ dynamic: true }) : null,
+                url: author ? author.displayAvatarURL({ dynamic: true }) : null,
+            },
+        }).setColor(color || "#000000");
+
+
+
+        (message ? message.edit({
+            embeds: [embed]
+        }) : channel.send({
+            embeds: [embed]
+        })).then(m => {
             interaction.editReply({
                 embeds: [
                     new EmbedBuilder({
                         title: "✅ Message Sent",
                         description: `Jump to the [Message](${m.url})`,
-                        }).setColor("DarkGreen")
+                    }).setColor("DarkGreen")
                 ]
             })
         }).catch(e => {
